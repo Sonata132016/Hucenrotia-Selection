@@ -72,6 +72,27 @@ const App = {
         date: new Date().toISOString()
       });
       localStorage.setItem('hucenrotia_state', JSON.stringify(s));
+      
+      // Send data to Google Sheets securely
+      try {
+        const scriptUrl = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3cHgxeTA4Tl9Kbjg1YkNHU0htNW9oWDFfY29QdVpFeWpzREo1bkpVQi14UXM4dUpHblpqbEJ0Y2k3UURQNXJSMC9leGVj");
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save',
+            name: user.name,
+            email: user.email,
+            course: course,
+            score: resultData.correct,
+            total: resultData.total,
+            xp: resultData.xp
+          })
+        }).catch(err => console.error("Sheet save error:", err));
+      } catch (err) {
+        console.error("Failed to decode token", err);
+      }
     }
   },
 
