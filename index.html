@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hucenrotia Selection — TEEP Internship AI Robotics Quiz</title>
+  <meta name="description" content="Test your knowledge of cutting-edge AI robotics research — HIMLoco and NaVILA — in this Duolingo-style interactive quiz for the TEEP Internship selection.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-brand">
+        <div class="logo-icon">🤖</div>
+        <span>Hucenrotia</span>
+      </div>
+      <div class="navbar-xp xp-display">⚡ 0 XP</div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">🎓 TEEP Internship — Selection Quiz</div>
+      <div class="mascot">
+        <div class="mascot-glow"></div>
+        <div class="mascot-body">
+          <div class="mascot-arm-l"></div>
+          <div class="mascot-arm-r"></div>
+          <div class="mascot-face">🤖</div>
+        </div>
+      </div>
+      <h1>Master <span>AI Robotics</span><br>Research!</h1>
+      <p>
+        Challenge yourself with questions from two landmark papers:
+        <strong>HIMLoco</strong> (ICLR 2024) and <strong>NaVILA</strong> (RSS 2025).
+        Answer questions, earn XP, and prove your knowledge!
+      </p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num">50</div>
+        <div class="stat-desc">Total Questions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2</div>
+        <div class="stat-desc">Research Papers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4</div>
+        <div class="stat-desc">Question Types</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10</div>
+        <div class="stat-desc">Image Questions</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Courses -->
+  <section class="courses-section">
+    <div class="container">
+      <div class="section-title">📚 Choose Your Course</div>
+      <div class="courses-grid">
+
+        <!-- HIMLoco Card -->
+        <div class="course-card himloco" id="card-himloco">
+          <div class="course-card-header">
+            <div class="course-tag">🤸 Locomotion · ICLR 2024</div>
+            <div class="difficulty-dots">
+              <div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="course-card-title">HIMLoco</div>
+            <div class="course-card-subtitle">Hybrid Internal Model for Agile Legged Locomotion</div>
+          </div>
+          <div class="course-card-body">
+            <div class="course-stats">
+              <div class="course-stat">
+                <span class="course-stat-value">25</span>
+                <span class="course-stat-label">Questions</span>
+              </div>
+              <div class="course-stat">
+                <span class="course-stat-value" id="himloco-xp">250</span>
+                <span class="course-stat-label">Max XP</span>
+              </div>
+              <div class="course-stat">
+                <span class="course-stat-value" id="himloco-best">—</span>
+                <span class="course-stat-label">Best Score</span>
+              </div>
+            </div>
+            <div class="course-progress-bar">
+              <div class="course-progress-fill" id="himloco-progress" style="width:0%"></div>
+            </div>
+            <div class="course-progress-text" id="himloco-progress-text">Not started yet</div>
+            <div class="course-topics">
+              <span class="topic-chip">🔩 HIM Framework</span>
+              <span class="topic-chip">📡 IMC Theory</span>
+              <span class="topic-chip">🏃 Locomotion</span>
+              <span class="topic-chip">🧠 Contrastive Learning</span>
+              <span class="topic-chip">🤖 Unitree Robots</span>
+              <span class="topic-chip">🖼️ Paper Figures</span>
+            </div>
+            <button class="btn-start" id="startHimloco" onclick="App.startQuiz('himloco')">
+              <span>🚀</span> Start Quiz
+            </button>
+          </div>
+        </div>
+
+        <!-- NaVILA Card -->
+        <div class="course-card navila" id="card-navila">
+          <div class="course-card-header">
+            <div class="course-tag">🗺️ Navigation · RSS 2025</div>
+            <div class="difficulty-dots">
+              <div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div>
+            </div>
+            <div class="course-card-title">NaVILA</div>
+            <div class="course-card-subtitle">Legged Robot Vision-Language-Action Model for Navigation</div>
+          </div>
+          <div class="course-card-body">
+            <div class="course-stats">
+              <div class="course-stat">
+                <span class="course-stat-value">25</span>
+                <span class="course-stat-label">Questions</span>
+              </div>
+              <div class="course-stat">
+                <span class="course-stat-value" id="navila-xp">250</span>
+                <span class="course-stat-label">Max XP</span>
+              </div>
+              <div class="course-stat">
+                <span class="course-stat-value" id="navila-best">—</span>
+                <span class="course-stat-label">Best Score</span>
+              </div>
+            </div>
+            <div class="course-progress-bar">
+              <div class="course-progress-fill" id="navila-progress" style="width:0%"></div>
+            </div>
+            <div class="course-progress-text" id="navila-progress-text">Not started yet</div>
+            <div class="course-topics">
+              <span class="topic-chip">👁️ Vision-Language</span>
+              <span class="topic-chip">🗣️ VLA Model</span>
+              <span class="topic-chip">🏠 Indoor Navigation</span>
+              <span class="topic-chip">🦾 LLaMA 3-8B</span>
+              <span class="topic-chip">📹 Habitat Sim</span>
+              <span class="topic-chip">🖼️ Paper Figures</span>
+            </div>
+            <button class="btn-start" id="startNavila" onclick="App.startQuiz('navila')">
+              <span>🚀</span> Start Quiz
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        TEEP Internship Selection · Content from
+        <a href="https://github.com/InternRobotics/HIMLoco" target="_blank">HIMLoco</a> &
+        <a href="https://navila-bot.github.io/" target="_blank">NaVILA</a> · Built for Hucenrotia Selection
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      updateXPDisplays();
+      // Update HIMLoco progress
+      const hp = App.getCourseProgress('himloco');
+      if (hp.attempts > 0) {
+        document.getElementById('himloco-best').textContent = hp.bestScore + '%';
+        document.getElementById('himloco-progress').style.width = hp.bestScore + '%';
+        document.getElementById('himloco-progress-text').textContent = hp.completed ? '✅ Completed! Attempt #' + hp.attempts : 'Best: ' + hp.bestScore + '% · ' + hp.attempts + ' attempt(s)';
+        document.getElementById('startHimloco').textContent = '🔁 Retake Quiz';
+      }
+      // Update NaVILA progress
+      const np = App.getCourseProgress('navila');
+      if (np.attempts > 0) {
+        document.getElementById('navila-best').textContent = np.bestScore + '%';
+        document.getElementById('navila-progress').style.width = np.bestScore + '%';
+        document.getElementById('navila-progress-text').textContent = np.completed ? '✅ Completed! Attempt #' + np.attempts : 'Best: ' + np.bestScore + '% · ' + np.attempts + ' attempt(s)';
+        document.getElementById('startNavila').textContent = '🔁 Retake Quiz';
+      }
+    });
+  </script>
+</body>
+</html>
