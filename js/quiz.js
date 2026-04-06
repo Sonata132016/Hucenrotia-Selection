@@ -7,7 +7,6 @@
   // --- State ---
   let questions = [];
   let currentIndex = 0;
-  let lives = 3;
   let sessionXP = 0;
   let correctCount = 0;
   let selectedAnswer = null;
@@ -28,7 +27,7 @@
   const feedbackTitle  = document.getElementById('feedbackTitle');
   const feedbackExplain= document.getElementById('feedbackExplain');
   const btnContinue    = document.getElementById('btnContinue');
-  const heartsEl       = document.getElementById('hearts');
+  const scoreCounterEl = document.getElementById('scoreCounter');
   const xpCounterEl    = document.getElementById('xpCounter');
   const xpPopup        = document.getElementById('xpPopup');
   const modal          = document.getElementById('modal');
@@ -42,8 +41,8 @@
     // Shuffle and take all 25 questions
     questions = shuffle([...pool]);
 
-    renderHearts();
     updateXPDisplay();
+    updateScoreDisplay();
     loadQuestion();
 
     document.getElementById('btnClose').addEventListener('click', () => {
@@ -74,35 +73,8 @@
     progressFill.style.width = pct + '%';
   }
 
-  // --- Hearts ---
-  function renderHearts() {
-    heartsEl.innerHTML = '';
-    for (let i = 0; i < 3; i++) {
-      const h = document.createElement('span');
-      h.className = 'heart' + (i >= lives ? ' lost' : '');
-      h.textContent = '❤️';
-      heartsEl.appendChild(h);
-    }
-  }
-
-  function loseHeart() {
-    if (lives > 0) {
-      lives--;
-      const hearts = heartsEl.querySelectorAll('.heart');
-      hearts[lives].classList.add('breaking');
-      setTimeout(() => {
-        hearts[lives].classList.remove('breaking');
-        hearts[lives].classList.add('lost');
-      }, 400);
-    }
-    if (lives === 0) {
-      setTimeout(gameOver, 600);
-    }
-  }
-
-  function gameOver() {
-    saveProgress(false);
-    window.location.href = 'results.html';
+  function updateScoreDisplay() {
+    if(scoreCounterEl) scoreCounterEl.innerHTML = '💯 ' + correctCount;
   }
 
   // --- XP ---
@@ -337,10 +309,10 @@
       sessionXP += xpGain;
       App.addXP(xpGain);
       updateXPDisplay();
+      updateScoreDisplay();
       showXPGain(xpGain);
       showFeedback(true, q.explanation);
     } else {
-      loseHeart();
       showFeedback(false, q.explanation);
     }
   }
@@ -366,24 +338,26 @@
 
   function saveProgress(completed) {
     const elapsed = Math.round((Date.now() - (App.getState().quizStartTime || Date.now())) / 1000);
-    App.setState({
-      lastResult: {
-        course,
-        correct: correctCount,
-        total: questions.length,
-        xp: sessionXP,
-        lives,
-        elapsed,
-        completed
-      }
-    });
-    const pct = Math.round((correctCount / questions.length) * 100);
-    const prev = App.getCourseProgress(course);
-    App.setCourseProgress(course, {
-      completed: completed || prev.completed,
-      bestScore: Math.max(prev.bestScore || 0, pct),
-      attempts: (prev.attempts || 0) + 1
-    });
+    const resultObj = {
+      course,
+      correct: correctCount,
+      total: questions.length,
+      xp: sessionXP,
+      elapsed,
+      completed
+    };
+    
+    App.setState({ lastResult: resultObj });
+    
+    if (completed) {
+      App.saveUserResult(course, resultObj);
+      const prev = App.getCourseProgress(course);
+      App.setCourseProgress(course, {
+        completed: true,
+        bestScore: Math.max(prev.bestScore || 0, Math.round((correctCount / questions.length) * 100)),
+        attempts: (prev.attempts || 0) + 1
+      });
+    }
   }
 
   // Boot

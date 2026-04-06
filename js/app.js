@@ -38,9 +38,47 @@ const App = {
     return s.totalXP;
   },
 
-  startQuiz(course) {
-    this.setState({ currentCourse: course, quizStartTime: Date.now() });
+  startQuiz(course, userName, userEmail) {
+    this.setState({ 
+      currentCourse: course, 
+      quizStartTime: Date.now(),
+      currentUser: { name: userName, email: userEmail }
+    });
     window.location.href = 'quiz.html';
+  },
+
+  hasTakenQuiz(email, course) {
+    const s = this.getState();
+    if (!s.leaderboards || !s.leaderboards[course]) return false;
+    return s.leaderboards[course].some(u => u.email.toLowerCase() === email.toLowerCase());
+  },
+
+  saveUserResult(course, resultData) {
+    const s = this.getState();
+    const user = s.currentUser;
+    if (!user) return;
+    
+    if (!s.leaderboards) s.leaderboards = {};
+    if (!s.leaderboards[course]) s.leaderboards[course] = [];
+    
+    const existing = s.leaderboards[course].find(u => u.email.toLowerCase() === user.email.toLowerCase());
+    if (!existing) {
+      s.leaderboards[course].push({
+        name: user.name,
+        email: user.email,
+        score: resultData.correct,
+        total: resultData.total,
+        xp: resultData.xp,
+        date: new Date().toISOString()
+      });
+      localStorage.setItem('hucenrotia_state', JSON.stringify(s));
+    }
+  },
+
+  getLeaderboard(course) {
+    const s = this.getState();
+    if (!s.leaderboards || !s.leaderboards[course]) return [];
+    return s.leaderboards[course].sort((a, b) => b.score - a.score || b.xp - a.xp);
   },
 
   formatXP(xp) {

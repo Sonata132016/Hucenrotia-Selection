@@ -55,11 +55,23 @@
         <div style="margin-left:auto;font-size:1.2rem" id="courseBadgeStar">⭐</div>
       </div>
 
+      <!-- Leaderboard -->
+      <div style="margin-top:2rem">
+        <h3 style="text-align:left;color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem">🏆 Live Leaderboard</h3>
+        <div class="leaderboard" id="leaderboardContainer">
+          <div class="leaderboard-header">
+            <div>Rank</div>
+            <div>Candidate</div>
+            <div style="text-align:right">Score</div>
+            <div style="text-align:right">XP</div>
+          </div>
+          <div id="leaderboardBody"></div>
+        </div>
+      </div>
+
       <!-- Actions -->
-      <div class="results-actions">
-        <button class="btn-primary" id="btnRetry">🔁 Retry This Course</button>
-        <button class="btn-secondary" id="btnOther">🗺️ Try Other Course</button>
-        <button class="btn-secondary" id="btnHome" style="border-color:var(--text-muted);color:var(--text-muted)">🏠 Back to Home</button>
+      <div class="results-actions" style="margin-top:2rem">
+        <button class="btn-primary" id="btnHome" style="border-color:var(--text-muted);color:var(--bg)">🏠 Back to Home</button>
       </div>
     </div>
   </div>
@@ -122,12 +134,30 @@
         launchConfetti(document.getElementById('confettiCanvas'));
       }
 
+      // Fetch and render Leaderboard
+      const lbData = App.getLeaderboard(course);
+      const lbBody = document.getElementById('leaderboardBody');
+      if (lbData.length === 0) {
+        lbBody.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--text-muted)">No candidates yet.</div>';
+      } else {
+        lbBody.innerHTML = lbData.map((u, i) => {
+          const rank = i + 1;
+          const rankClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+          return `
+            <div class="leaderboard-row">
+              <div class="lb-rank ${rankClass}">#${rank}</div>
+              <div style="text-align:left">
+                <div class="lb-name">${u.name}</div>
+                <div class="lb-email">${u.email}</div>
+              </div>
+              <div class="lb-score">${u.score}/${u.total}</div>
+              <div class="lb-xp">${u.xp}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
       // Buttons
-      document.getElementById('btnRetry').addEventListener('click', () => App.startQuiz(course));
-      document.getElementById('btnOther').addEventListener('click', () => {
-        const other = course === 'himloco' ? 'navila' : 'himloco';
-        App.startQuiz(other);
-      });
       document.getElementById('btnHome').addEventListener('click', () => {
         window.location.href = 'index.html';
       });

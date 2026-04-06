@@ -215,3 +215,26 @@ p{font-size:1rem;color:var(--text-muted)}
 .anim-pop{animation:pop .5s cubic-bezier(.34,1.56,.64,1) forwards}
 
 @media(max-width:640px){.courses-grid{grid-template-columns:1fr}.options-grid{grid-template-columns:1fr}.stats-row{gap:1.5rem}.feedback-inner{flex-direction:column;align-items:flex-start}.btn-continue{width:100%}}
+
+/* =============================================
+   REGISTRATION & LEADERBOARD
+============================================= */
+.form-group { margin-bottom: 1.2rem; text-align: left; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 800; color: var(--text-muted); margin-bottom: 0.4rem; }
+.form-control { width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 2px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; font-family: var(--font); transition: border-color var(--transition); }
+.form-control:focus { border-color: var(--green); outline: none; }
+.error-msg { color: var(--red); font-size: 0.85rem; font-weight: 700; margin-top: 0.4rem; display: none; }
+.error-msg.show { display: block; }
+
+.leaderboard { margin-top: 2rem; border: 2px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--card2); }
+.leaderboard-header { background: rgba(0,0,0,0.2); padding: 1rem; font-weight: 800; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: grid; grid-template-columns: 3rem 1fr 4rem 5rem; gap: 1rem; }
+.leaderboard-row { display: grid; grid-template-columns: 3rem 1fr 4rem 5rem; gap: 1rem; padding: 1rem; border-top: 1px solid var(--border); align-items: center; transition: background 0.2s; }
+.leaderboard-row:hover { background: rgba(255,255,255,0.03); }
+.lb-rank { font-weight: 900; font-size: 1.1rem; color: var(--text-muted); text-align: center; }
+.lb-rank.top-1 { color: #FFD700; font-size: 1.4rem; }
+.lb-rank.top-2 { color: #C0C0C0; font-size: 1.2rem; }
+.lb-rank.top-3 { color: #CD7F32; font-size: 1.2rem; }
+.lb-name { font-weight: 800; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-email { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-score { font-weight: 900; color: var(--green); text-align: right; }
+.lb-xp { font-weight: 800; color: var(--gold); font-size: 0.85rem; text-align: right; }

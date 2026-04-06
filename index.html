@@ -106,7 +106,7 @@
               <span class="topic-chip">🤖 Unitree Robots</span>
               <span class="topic-chip">🖼️ Paper Figures</span>
             </div>
-            <button class="btn-start" id="startHimloco" onclick="App.startQuiz('himloco')">
+            <button class="btn-start" id="startHimloco" onclick="openRegistrationModal('himloco')">
               <span>🚀</span> Start Quiz
             </button>
           </div>
@@ -149,7 +149,7 @@
               <span class="topic-chip">📹 Habitat Sim</span>
               <span class="topic-chip">🖼️ Paper Figures</span>
             </div>
-            <button class="btn-start" id="startNavila" onclick="App.startQuiz('navila')">
+            <button class="btn-start" id="startNavila" onclick="openRegistrationModal('navila')">
               <span>🚀</span> Start Quiz
             </button>
           </div>
@@ -170,8 +170,66 @@
     </div>
   </footer>
 
+  <!-- Registration Modal -->
+  <div class="modal-overlay" id="regModalOverlay">
+    <div class="modal">
+      <div class="modal-emoji">📝</div>
+      <h2>Join the Course</h2>
+      <p>Please enter your details to take the exam. You can only take it once!</p>
+      
+      <div class="form-group">
+        <label for="regName">Full Name</label>
+        <input type="text" id="regName" class="form-control" placeholder="E.g. John Doe">
+      </div>
+      <div class="form-group">
+        <label for="regEmail">Email Address</label>
+        <input type="email" id="regEmail" class="form-control" placeholder="E.g. john@example.com">
+        <div class="error-msg" id="regError">This email has already completed this quiz.</div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:2rem">
+        <button class="btn-primary" id="btnConfirmReg">Start Exam!</button>
+        <button class="btn-secondary" id="btnCancelReg">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/app.js"></script>
   <script>
+    let selectedCourse = '';
+    
+    function openRegistrationModal(course) {
+      selectedCourse = course;
+      document.getElementById('regName').value = '';
+      document.getElementById('regEmail').value = '';
+      document.getElementById('regError').classList.remove('show');
+      document.getElementById('regModalOverlay').classList.add('open');
+    }
+
+    document.getElementById('btnCancelReg').addEventListener('click', () => {
+      document.getElementById('regModalOverlay').classList.remove('open');
+    });
+
+    document.getElementById('btnConfirmReg').addEventListener('click', () => {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const errorMsg = document.getElementById('regError');
+      
+      if (!name || !email) {
+        errorMsg.textContent = 'Please fill in both name and email.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (App.hasTakenQuiz(email, selectedCourse)) {
+        errorMsg.textContent = 'This email has already completed this quiz!';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      App.startQuiz(selectedCourse, name, email);
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       updateXPDisplays();
       // Update HIMLoco progress
@@ -180,7 +238,6 @@
         document.getElementById('himloco-best').textContent = hp.bestScore + '%';
         document.getElementById('himloco-progress').style.width = hp.bestScore + '%';
         document.getElementById('himloco-progress-text').textContent = hp.completed ? '✅ Completed! Attempt #' + hp.attempts : 'Best: ' + hp.bestScore + '% · ' + hp.attempts + ' attempt(s)';
-        document.getElementById('startHimloco').textContent = '🔁 Retake Quiz';
       }
       // Update NaVILA progress
       const np = App.getCourseProgress('navila');
@@ -188,7 +245,6 @@
         document.getElementById('navila-best').textContent = np.bestScore + '%';
         document.getElementById('navila-progress').style.width = np.bestScore + '%';
         document.getElementById('navila-progress-text').textContent = np.completed ? '✅ Completed! Attempt #' + np.attempts : 'Best: ' + np.bestScore + '% · ' + np.attempts + ' attempt(s)';
-        document.getElementById('startNavila').textContent = '🔁 Retake Quiz';
       }
     });
   </script>
