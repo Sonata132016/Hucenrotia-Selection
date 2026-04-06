@@ -74,12 +74,12 @@
   }
 
   function updateScoreDisplay() {
-    if(scoreCounterEl) scoreCounterEl.innerHTML = '💯 ' + correctCount;
+    if(scoreCounterEl) scoreCounterEl.innerHTML = 'Score: ' + correctCount;
   }
 
   // --- XP ---
   function updateXPDisplay() {
-    xpCounterEl.innerHTML = '⚡ ' + sessionXP + ' XP';
+    xpCounterEl.innerHTML = sessionXP + ' XP';
   }
 
   function showXPGain(amount) {
@@ -174,12 +174,12 @@
 
     const trueBtn = document.createElement('button');
     trueBtn.className = 'tf-btn true-btn';
-    trueBtn.innerHTML = '<span class="tf-icon">✅</span>TRUE';
+    trueBtn.innerHTML = 'TRUE';
     trueBtn.addEventListener('click', () => selectTF(true, trueBtn, falseBtn, q));
 
     const falseBtn = document.createElement('button');
     falseBtn.className = 'tf-btn false-btn';
-    falseBtn.innerHTML = '<span class="tf-icon">❌</span>FALSE';
+    falseBtn.innerHTML = 'FALSE';
     falseBtn.addEventListener('click', () => selectTF(false, trueBtn, falseBtn, q));
 
     grid.appendChild(trueBtn);
@@ -213,12 +213,12 @@
     const blankSlot = document.createElement('span');
     blankSlot.className = 'blank-slot';
     blankSlot.id = 'blankSlot';
-    blankSlot.textContent = '⬜ tap a word below';
+    blankSlot.textContent = '... tap a word below';
     blankSlot.addEventListener('click', () => {
       if (answered) return;
       // Clear the slot
       if (filledWord) {
-        blankSlot.textContent = '⬜ tap a word below';
+        blankSlot.textContent = '... tap a word below';
         blankSlot.classList.remove('filled');
         // Re-enable chip
         const chip = optionsArea.querySelector(`[data-word="${filledWord}"]`);
@@ -319,7 +319,7 @@
 
   function showFeedback(correct, explanation) {
     feedbackBar.className = 'feedback-bar show ' + (correct ? 'correct-bar' : 'wrong-bar');
-    feedbackTitle.textContent = correct ? '🎉 Correct!' : '😬 Not quite...';
+    feedbackTitle.textContent = correct ? 'Correct!' : 'Not quite...';
     feedbackExplain.textContent = explanation;
     btnCheck.className = 'btn-check ' + (correct ? 'continue-correct' : 'continue-wrong');
     btnCheck.textContent = 'CONTINUE →';

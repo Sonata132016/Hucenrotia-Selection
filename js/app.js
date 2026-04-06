@@ -135,7 +135,7 @@ const App = {
 // Update all XP displays on page
 function updateXPDisplays() {
   document.querySelectorAll('.xp-display').forEach(el => {
-    el.textContent = '⚡ ' + App.formatXP(App.getTotalXP()) + ' XP';
+    el.textContent = App.formatXP(App.getTotalXP()) + ' XP';
   });
 }
 
