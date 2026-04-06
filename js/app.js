@@ -101,6 +101,13 @@ const App = {
 
   formatXP(xp) {
     return xp >= 1000 ? (xp / 1000).toFixed(1) + 'k' : xp;
+  },
+
+  clearAllData() {
+    if (confirm("Are you sure you want to completely reset all candidate attempts and leaderboard history? This cannot be undone.")) {
+      localStorage.removeItem('hucenrotia_state');
+      window.location.reload();
+    }
   }
 };
 
