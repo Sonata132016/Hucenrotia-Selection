@@ -6,10 +6,10 @@ const QUESTIONS = {
   himloco: [
     {
       id:'h1', type:'mcq',
-      question:'At which major machine learning conference was HIMLoco accepted?',
-      options:['NeurIPS 2024','ICLR 2024','ICML 2023','CVPR 2024'],
+      question:'How does HIMLoco handle unknown environmental properties (like ground friction and restitution) without explicitly modeling them?',
+      options:['It uses external LIDAR to scan the terrain','It treats them as disturbances and estimates them via the robot\'s simulated response','It assumes all terrain is perfectly flat indoor flooring','It trains a separate neural network for each specific terrain type'],
       answer:1,
-      explanation:'HIMLoco was accepted at ICLR 2024 (The Twelfth International Conference on Learning Representations).'
+      explanation:'HIMLoco uses the Internal Model Control (IMC) paradigm, treating environmental properties as disturbances that can be estimated by comparing the expected vs. actual response of the robot.'
     },
     {
       id:'h2', type:'mcq',
@@ -67,10 +67,10 @@ const QUESTIONS = {
     },
     {
       id:'h10', type:'mcq',
-      question:'What is the arXiv paper ID for the HIMLoco paper?',
-      options:['2404.14405','2312.11460','2401.00123','2310.99887'],
-      answer:1,
-      explanation:'HIMLoco is arXiv:2312.11460 — "Hybrid Internal Model: Learning Agile Legged Locomotion with Simulated Robot Response".'
+      question:'In the context of HIMLoco, what is the primary benefit of the Hybrid Internal Model (HIM)?',
+      options:['It completely eliminates the need for any neural network','It allows the policy to operate using ONLY exteroceptive cameras','It mitigates information loss and handles sensory noise efficiently','It requires massive computational power but guarantees perfect stability'],
+      answer:2,
+      explanation:'The HIM addresses limitations of existing learning paradigms by minimizing information loss, handling noisy observations, and improving sample efficiency across different sensor configurations.'
     },
     {
       id:'h11', type:'truefalse',
@@ -128,17 +128,17 @@ const QUESTIONS = {
     },
     {
       id:'h19', type:'mcq',
-      question:'Which institution is the primary affiliation for the HIMLoco paper?',
-      options:['MIT CSAIL','Stanford Robotics','Shanghai AI Laboratory','Carnegie Mellon Robotics Institute'],
-      answer:2,
-      explanation:'HIMLoco\'s primary affiliation is Shanghai AI Laboratory, with co-authors from Zhejiang University and Tsinghua University.'
+      question:'Why is contrastive learning used to train the latency embedding in HIMLoco?',
+      options:['To generate high-resolution images of the terrain','To enhance robustness by utilizing batch-level information and dealing with noise','To translate natural language commands into motor actions','To minimize the physical wear and tear on the servos'],
+      answer:1,
+      explanation:'Contrastive learning helps the network explicitly handle noise and leverage batch-level statistics, creating a more robust and adaptable embedding in unpredictable environments.'
     },
     {
       id:'h20', type:'mcq',
-      question:'What CUDA version was used in the HIMLoco tested environment?',
-      options:['CUDA 10.2','CUDA 11.3','CUDA 12.0','CUDA 11.8'],
-      answer:2,
-      explanation:'HIMLoco was tested under CUDA 12.0 (with NVIDIA Driver 525.147.05, Python 3.7.16, PyTorch 1.10.0+cu113).'
+      question:'What is the exact target that the hybrid internal embedding is optimized to mimic?',
+      options:['The exact topographic map of the ground','The robot\'s successor state where system response is naturally embedded','The total power consumption of the robot','A video stream of the robot from an external camera'],
+      answer:1,
+      explanation:'The embedding is optimized to be close to the robot\'s successor state, which naturally embeds the response of the system (and thus, the environmental disturbance).'
     },
     // --- Image Questions ---
     {
@@ -191,10 +191,10 @@ const QUESTIONS = {
   navila: [
     {
       id:'n1', type:'mcq',
-      question:'At which prestigious robotics conference was NaVILA accepted?',
-      options:['ICRA 2025','RSS 2025','IROS 2025','CoRL 2025'],
+      question:'Why does NaVILA use a hierarchical (two-level) control flow rather than a single end-to-end model?',
+      options:['Because large language models cannot fit on a robot','To decouple slow reasoning (VLA) from fast, high-frequency motor control (Locomotion Policy)','To prevent the robot from understanding human language','Because end-to-end models cannot process RGB camera feeds'],
       answer:1,
-      explanation:'NaVILA was accepted at RSS 2025 (Robotics: Science and Systems) — one of the top robotics venues.'
+      explanation:'The VLA runs at a slower inference rate for high-level reasoning, while the low-level locomotion policy must run at a high frequency (e.g., 500Hz) to maintain stability and avoid obstacles.'
     },
     {
       id:'n2', type:'mcq',
@@ -239,10 +239,10 @@ const QUESTIONS = {
     },
     {
       id:'n8', type:'mcq',
-      question:'What is the arXiv paper ID for NaVILA?',
-      options:['2312.11460','2408.00123','2412.04453','2501.09876'],
-      answer:2,
-      explanation:'NaVILA is arXiv:2412.04453 — "NaVILA: Legged Robot Vision-Language-Action Model for Navigation".'
+      question:'What advantage does NaVILA gain from its integration with 3D scene question-answering capabilities (e.g., ScanQA)?',
+      options:['It allows the robot to draw 2D floor plans automatically','It provides spatial reasoning and semantic scene understanding without explicit map building','It enables the robot to pass the Turing test','It significantly reduces battery consumption'],
+      answer:1,
+      explanation:'By utilizing 3D scene Q&A datasets, NaVILA relies on Vision-Language-Action semantic reasoning instead of rigidly building traditional 3D geometric maps.'
     },
     {
       id:'n9', type:'truefalse',
@@ -300,23 +300,23 @@ const QUESTIONS = {
     },
     {
       id:'n17', type:'mcq',
-      question:'What Python version is specified for the NaVILA evaluation environment?',
-      options:['Python 3.7','Python 3.8','Python 3.10','Python 3.12'],
-      answer:2,
-      explanation:'The NaVILA evaluation environment requires Python 3.10 (conda create -n navila-eval python=3.10).'
+      question:'What specific risk does the high-frequency Locomotion Policy mitigate during NaVILA operation?',
+      options:['Language mistranslations from the VLA','Crashing into sudden obstacles while the VLA is processing its next reasoning step','Overheating of the GPU due to LLM inference','Drifting of the GPS coordinates'],
+      answer:1,
+      explanation:'Because VLA inference is slow, the robot would be blind between reasoning steps. The fast Locomotion Policy takes over to ensure real-time obstacle avoidance and stability.'
     },
     {
       id:'n18', type:'truefalse',
-      question:'NaVILA was trained completely from scratch without using any pretrained visual or language models.',
-      answer:false,
-      explanation:'False! NaVILA fine-tunes from a pretrained model (navila-siglip-llama3-8b-v1.5-pretrain) that has vision-language capabilities.'
+      question:'NaVILA fine-tunes a pretrained model that already has vision-language capabilities rather than training completely from scratch.',
+      answer:true,
+      explanation:'True! NaVILA leverages a pretrained model (combining SigLIP and LLaMA) which is then fine-tuned on embodied navigation datasets.'
     },
     {
       id:'n19', type:'mcq',
-      question:'What command-line tool does NaVILA documentation specify for downloading YouTube training videos?',
-      options:['youtube-dl','ffmpeg','yt-dlp','wget'],
-      answer:2,
-      explanation:'NaVILA uses yt-dlp (a maintained fork of youtube-dl) to download YouTube videos for the Human Touring dataset.'
+      question:'How does NaVILA utilize the "Human Touring" videos from YouTube?',
+      options:['To teach the robot how to edit video files','As rich demonstration data for visual-language instruction following','To evaluate audio-processing algorithms for ambient noise','To train the robot\'s suspension system'],
+      answer:1,
+      explanation:'Human Touring videos provide diverse, real-world visual trajectories. NaVILA uses them, alongside annotations, as strong demonstration data for instruction following.'
     },
     {
       id:'n20', type:'mcq',
