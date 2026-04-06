@@ -12,25 +12,25 @@
     <canvas id="confettiCanvas"></canvas>
 
     <div class="results-card anim-pop">
-      <!-- Status Icon & Title -->
-      <div class="results-emoji" id="resultsEmoji">PASS</div>
+      <!-- Emoji & Title -->
+      <div class="results-emoji" id="resultsEmoji">🎉</div>
       <div class="results-title" id="resultsTitle">Amazing!</div>
       <div class="results-subtitle" id="resultsSubtitle">You completed the quiz!</div>
 
       <!-- Stats grid -->
       <div class="results-stats">
         <div class="result-stat">
-          <div class="result-stat-icon">SCORE</div>
+          <div class="result-stat-icon">✅</div>
           <div class="result-stat-value" id="statCorrect">—</div>
           <div class="result-stat-label">Correct</div>
         </div>
         <div class="result-stat">
-          <div class="result-stat-icon">XP</div>
+          <div class="result-stat-icon">⚡</div>
           <div class="result-stat-value" id="statXP">—</div>
           <div class="result-stat-label">XP Earned</div>
         </div>
         <div class="result-stat">
-          <div class="result-stat-icon">TIME</div>
+          <div class="result-stat-icon">⏱️</div>
           <div class="result-stat-value" id="statTime">—</div>
           <div class="result-stat-label">Time</div>
         </div>
@@ -47,17 +47,17 @@
 
       <!-- Course badge -->
       <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;margin-bottom:2rem;text-align:left;display:flex;align-items:center;gap:0.75rem">
-        <span style="font-size:1.6rem" id="courseBadgeIcon">ID</span>
+        <span style="font-size:1.6rem" id="courseBadgeIcon">🤖</span>
         <div>
           <div style="font-weight:800;color:var(--white);font-size:0.95rem" id="courseBadgeName">HIMLoco</div>
           <div style="font-size:0.78rem;color:var(--text-muted)" id="courseBadgeDesc">Quiz completed</div>
         </div>
-        <div style="margin-left:auto;font-size:1.2rem" id="courseBadgeStar"></div>
+        <div style="margin-left:auto;font-size:1.2rem" id="courseBadgeStar">⭐</div>
       </div>
 
       <!-- Leaderboard -->
       <div style="margin-top:2rem">
-        <h3 style="text-align:left;color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem">Live Leaderboard</h3>
+        <h3 style="text-align:left;color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem">🏆 Live Leaderboard</h3>
         <div class="leaderboard" id="leaderboardContainer">
           <div class="leaderboard-header">
             <div>Rank</div>
@@ -71,7 +71,7 @@
 
       <!-- Actions -->
       <div class="results-actions" style="margin-top:2rem">
-        <button class="btn-primary" id="btnHome" style="border-color:var(--text-muted);color:var(--bg)">Back to Home</button>
+        <button class="btn-primary" id="btnHome" style="border-color:var(--text-muted);color:var(--bg)">🏠 Back to Home</button>
       </div>
     </div>
   </div>
@@ -87,15 +87,15 @@
       const course  = result.course || 'himloco';
       const pct     = Math.round((correct / total) * 100);
 
-      // Status icon & message
-      let statusIcon, title, subtitle;
-      if (pct >= 90)      { statusIcon='EXCELLENT'; title='Outstanding!';    subtitle='You nailed it! Near-perfect score!'; }
-      else if (pct >= 75) { statusIcon='GREAT';     title='Excellent Work!';  subtitle='Great understanding of the research!'; }
-      else if (pct >= 60) { statusIcon='GOOD';      title='Good Job!';        subtitle='Solid performance — keep learning!'; }
-      else if (pct >= 40) { statusIcon='RETRY';     title='Keep Studying!';   subtitle='Review the papers and try again.'; }
-      else                { statusIcon='RETRY';     title='Don\'t Give Up!';  subtitle='Read the papers carefully and retry!'; }
+      // Emoji & message
+      let emoji, title, subtitle;
+      if (pct >= 90)      { emoji='🏆'; title='Outstanding!';    subtitle='You nailed it! Near-perfect score!'; }
+      else if (pct >= 75) { emoji='🎉'; title='Excellent Work!';  subtitle='Great understanding of the research!'; }
+      else if (pct >= 60) { emoji='😊'; title='Good Job!';        subtitle='Solid performance — keep learning!'; }
+      else if (pct >= 40) { emoji='📚'; title='Keep Studying!';   subtitle='Review the papers and try again.'; }
+      else                { emoji='💪'; title='Don\'t Give Up!';  subtitle='Read the papers carefully and retry!'; }
 
-      document.getElementById('resultsEmoji').textContent = statusIcon;
+      document.getElementById('resultsEmoji').textContent = emoji;
       document.getElementById('resultsTitle').textContent = title;
       document.getElementById('resultsSubtitle').textContent = subtitle;
 
@@ -117,19 +117,17 @@
 
       // Course badge
       const courseNames = { himloco: 'HIMLoco', navila: 'NaVILA' };
-      const courseIcons = { himloco: 'IMG', navila: 'NAV' };
+      const courseIcons = { himloco: '🤸', navila: '🗺️' };
       const courseDescs = {
         himloco: 'Hybrid Internal Model · ICLR 2024',
         navila:  'Vision-Language-Action · RSS 2025'
       };
-      document.getElementById('courseBadgeIcon').textContent = courseIcons[course] || 'ID';
+      document.getElementById('courseBadgeIcon').textContent = courseIcons[course] || '🤖';
       document.getElementById('courseBadgeName').textContent = courseNames[course] || course;
       document.getElementById('courseBadgeDesc').textContent = courseDescs[course] || 'Quiz completed';
 
-      const stars = pct >= 90 ? 'Grade: A' : pct >= 70 ? 'Grade: B' : 'Grade: C';
+      const stars = pct >= 90 ? '⭐⭐⭐' : pct >= 70 ? '⭐⭐' : '⭐';
       document.getElementById('courseBadgeStar').textContent = stars;
-      document.getElementById('courseBadgeStar').style.fontSize = '0.75rem';
-      document.getElementById('courseBadgeStar').style.fontWeight = '800';
 
       // Confetti if good score
       if (pct >= 70) {
