@@ -53,7 +53,7 @@ const App = {
     return s.leaderboards[course].some(u => u.email.toLowerCase() === email.toLowerCase());
   },
 
-  saveUserResult(course, resultData) {
+  async saveUserResult(course, resultData) {
     const s = this.getState();
     const user = s.currentUser;
     if (!user) return;
@@ -76,7 +76,7 @@ const App = {
       // Send data to Google Sheets securely
       try {
         const scriptUrl = atob("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3cHgxeTA4Tl9Kbjg1YkNHU0htNW9oWDFfY29QdVpFeWpzREo1bkpVQi14UXM4dUpHblpqbEJ0Y2k3UURQNXJSMC9leGVj");
-        fetch(scriptUrl, {
+        await fetch(scriptUrl, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
@@ -89,9 +89,9 @@ const App = {
             total: resultData.total,
             xp: resultData.xp
           })
-        }).catch(err => console.error("Sheet save error:", err));
+        });
       } catch (err) {
-        console.error("Failed to decode token", err);
+        console.error("Failed to decode token or send data", err);
       }
     }
   },

@@ -331,12 +331,12 @@
     loadQuestion();
   }
 
-  function finishQuiz() {
-    saveProgress(true);
+  async function finishQuiz() {
+    await saveProgress(true);
     window.location.href = 'results.html';
   }
 
-  function saveProgress(completed) {
+  async function saveProgress(completed) {
     const elapsed = Math.round((Date.now() - (App.getState().quizStartTime || Date.now())) / 1000);
     const resultObj = {
       course,
@@ -350,7 +350,7 @@
     App.setState({ lastResult: resultObj });
     
     if (completed) {
-      App.saveUserResult(course, resultObj);
+      await App.saveUserResult(course, resultObj);
       const prev = App.getCourseProgress(course);
       App.setCourseProgress(course, {
         completed: true,
