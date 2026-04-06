@@ -38,6 +38,10 @@
         <strong>HIMLoco</strong> (ICLR 2024) and <strong>NaVILA</strong> (RSS 2025).
         Answer questions, earn XP, and prove your knowledge!
       </p>
+      
+      <button class="btn-secondary" style="border-width:2px;font-size:0.95rem;padding:0.75rem 1.5rem;margin-top:1rem;color:var(--gold);border-color:var(--gold)" onclick="openGlobalLeaderboard()">
+        🏆 View Global Leaderboard
+      </button>
     </div>
   </section>
 
@@ -194,10 +198,56 @@
     </div>
   </div>
 
+  <!-- Global Leaderboard Modal -->
+  <div class="modal-overlay" id="globalLbModal">
+    <div class="modal" style="max-width:600px">
+      <div class="flex-between" style="margin-bottom:1.5rem">
+        <h2 style="margin:0;color:var(--white)">🏆 Global Leaderboard</h2>
+        <button class="btn-close" style="width:32px;height:32px;font-size:0.9rem" onclick="document.getElementById('globalLbModal').classList.remove('open')">✕</button>
+      </div>
+      <div class="leaderboard">
+        <div class="leaderboard-header" style="grid-template-columns: 3rem 1fr 4rem 4rem 4rem; padding: 0.8rem 1rem;">
+          <div>Rank</div>
+          <div>Candidate</div>
+          <div style="text-align:center">Courses</div>
+          <div style="text-align:right">Score</div>
+          <div style="text-align:right">XP</div>
+        </div>
+        <div id="globalLbBody" style="max-height:300px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/app.js"></script>
   <script>
     let selectedCourse = '';
     
+    function openGlobalLeaderboard() {
+      const lbData = App.getGlobalLeaderboard();
+      const lbBody = document.getElementById('globalLbBody');
+      if (lbData.length === 0) {
+        lbBody.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--text-muted)">No candidates yet.</div>';
+      } else {
+        lbBody.innerHTML = lbData.map((u, i) => {
+          const rank = i + 1;
+          const rankClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+          return `
+            <div class="leaderboard-row" style="grid-template-columns: 3rem 1fr 4rem 4rem 4rem; padding: 0.8rem 1rem;">
+              <div class="lb-rank ${rankClass}">#${rank}</div>
+              <div style="text-align:left">
+                <div class="lb-name">${u.name}</div>
+                <div class="lb-email">${u.email}</div>
+              </div>
+              <div style="text-align:center;font-weight:800;color:var(--text-muted)">${u.courses}/2</div>
+              <div class="lb-score">${u.score}/${u.total}</div>
+              <div class="lb-xp">${u.xp}</div>
+            </div>
+          `;
+        }).join('');
+      }
+      document.getElementById('globalLbModal').classList.add('open');
+    }
+
     function openRegistrationModal(course) {
       selectedCourse = course;
       document.getElementById('regName').value = '';

@@ -81,6 +81,24 @@ const App = {
     return s.leaderboards[course].sort((a, b) => b.score - a.score || b.xp - a.xp);
   },
 
+  getGlobalLeaderboard() {
+    const s = this.getState();
+    const map = {};
+    if (s.leaderboards) {
+      Object.keys(s.leaderboards).forEach(course => {
+        s.leaderboards[course].forEach(u => {
+          const email = u.email.toLowerCase();
+          if (!map[email]) map[email] = { name: u.name, email: u.email, score: 0, total: 0, xp: 0, courses: 0 };
+          map[email].score += u.score;
+          map[email].total += u.total;
+          map[email].xp += u.xp;
+          map[email].courses += 1;
+        });
+      });
+    }
+    return Object.values(map).sort((a, b) => b.score - a.score || b.xp - a.xp);
+  },
+
   formatXP(xp) {
     return xp >= 1000 ? (xp / 1000).toFixed(1) + 'k' : xp;
   }
