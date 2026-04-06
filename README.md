@@ -13,13 +13,10 @@ This website includes **50 quiz questions** from two landmark AI robotics resear
 
 ## 🎮 Features
 
-- 🟢 **Duolingo-style UI** with dark theme, green XP system, and animated feedback
-- ❤️ **3 Lives system** — lose a heart for each wrong answer
-- ⚡ **XP rewards** — earn 10 XP per correct answer, 15 XP for image questions
-- 📊 **Progress tracking** via localStorage (persists between sessions)
-- 🎉 **Confetti celebration** for scores ≥ 70%
-- 🖼️ **Image-based questions** using actual figures from the papers
-- 📱 **Fully responsive** — works on mobile and desktop
+-  **Progress tracking** via localStorage (persists between sessions)
+-  **Confetti celebration** for scores ≥ 70%
+-  **Image-based questions** using actual figures from the papers
+-  **Fully responsive** — works on mobile and desktop
 
 ## 🗂️ File Structure
 
@@ -55,13 +52,6 @@ Simply open `index.html` in any modern web browser — no build step required!
 npx serve .
 # Then visit http://localhost:3000
 ```
-
-## 🌐 GitHub Pages Deployment
-
-1. Push this repo to GitHub
-2. Go to **Settings → Pages**
-3. Select source: **Deploy from branch → main → / (root)**
-4. Your site will be live at: `https://sonata132016.github.io/Hucenrotia-Selection/`
 
 ## 📖 Paper References
 
