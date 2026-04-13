@@ -1,375 +1,251 @@
 // ============================================
-// QUESTION BANK — HIMLoco & NaVILA
+// QUESTION BANK
 // ============================================
 
 const QUESTIONS = {
   himloco: [
     {
-      id:'h1', type:'mcq',
-      question:'How does HIMLoco handle unknown environmental properties (like ground friction and restitution) without explicitly modeling them?',
-      options:['It uses external LIDAR to scan the terrain','It treats them as disturbances and estimates them via the robot\'s simulated response','It assumes all terrain is perfectly flat indoor flooring','It trains a separate neural network for each specific terrain type'],
-      answer:1,
-      explanation:'HIMLoco uses the Internal Model Control (IMC) paradigm, treating environmental properties as disturbances that can be estimated by comparing the expected vs. actual response of the robot.'
+      type: "image",
+      image: "assets/himloco/eq/contrastive_loss.png",
+      caption: "HIMLoco Contrastive Learning Scheme",
+      question: "1 (Explain Equation): Examine the contrastive learning formulation used in HIMLoco. During the swap prediction loss computation, what is the mathematical consequence of substituting Q (computed via Sinkhorn-Knopp) with a standard hard-argmax assignment over the prototypes?",
+      options: [
+        "It eliminates the need for a target network, allowing symmetric training on a single encoder branch.",
+        "It triggers a degenerate representation collapse where all batch samples are trivially mapped to the single densest prototype vector.",
+        "It perfectly minimizes the Euclidean distance between predicted velocity and ground truth velocity by bypassing the cross-entropy constraints.",
+        "It causes the temperature scaling parameter (τ) to exponentially decay to zero, halting all gradient flow."
+      ],
+      answer: 1,
+      explanation: "Hard-argmax assignment (winner-takes-all) without the equipartition constraints enforced by the Sinkhorn mapping inevitably leads to representation collapse. All representations converge to a single identical point in the latent space."
     },
     {
-      id:'h2', type:'mcq',
-      question:'Which sensors does HIMLoco\'s HIM framework use as the ONLY inputs?',
-      options:['Cameras and LiDAR','Joint encoders and IMU only','GPS and elevation maps','RGB-D cameras and joint encoders'],
-      answer:1,
-      explanation:'HIM leverages joint encoders and an Inertial Measurement Unit (IMU) as the only sensors — no cameras or elevation maps needed!'
+      type: "image",
+      image: "assets/himloco/eq/ppo_clip.png",
+      caption: "PPO Clipped Surrogate Objective",
+      question: "2 (Describe Reason using Equation): Based on the Proximal Policy Optimization (PPO) objective, why is it theoretically advantageous to clip the probability ratio r_t(θ) between 1-ε and 1+ε rather than applying a strict KL-divergence penalty constraint?",
+      options: [
+        "Clipping entirely removes the need to calculate Generalized Advantage Estimation (GAE), simplifying the temporal integration.",
+        "Clipping avoids the massive computational overhead of exactly computing and differentiating the second-order Hessian matrix required by KL penalties.",
+        "Clipping ensures that the advantages are always strictly positive, guaranteeing monotonic improvement at every optimization step.",
+        "Clipping acts directly as a substitute for the Value Function loss (L_VF), merging policy and critic optimization into one term."
+      ],
+      answer: 1,
+      explanation: "Strict KL-divergence constraints (as used in TRPO) require complex and computationally enormous second-order derivative approximations (Fisher Information Matrix). PPO's clipping achieves the same trust-region bounds using cheap first-order techniques."
     },
     {
-      id:'h3', type:'truefalse',
-      question:'HIMLoco requires elevation maps as a sensor input for locomotion control.',
-      answer:false,
-      explanation:'False! HIMLoco does NOT use elevation maps. It operates with minimal sensors: only joint encoders and IMU.'
+      type: "image",
+      image: "assets/himloco/imc.jpeg",
+      caption: "Internal Model Control (IMC) Block",
+      question: "3 (Explain Block Diagram): In the modified legged locomotion IMC diagram, an 'internal model' block runs parallel to the physical robot. What is the fundamental control loop function of this internal model?",
+      options: [
+        "It operates as a purely feedforward cascade, directly outputting the joint position targets necessary to clear unmodeled obstacles.",
+        "It builds an explicit high-fidelity simulation of terrain collision meshes to predict friction vectors a priori.",
+        "It simulates the expected ideal robot physics; the discrepancy between this ideal response and the actual response is then fed back to implicitly infer disturbances.",
+        "It completely overrides the high-frequency PD tracking loops to forcibly stabilize the center of mass trajectory."
+      ],
+      answer: 2,
+      explanation: "The architecture of IMC leverages a parallel model that simulates how the system *should* react. By comparing that to how the system *actually* reacts, the error perfectly encapsulates the unmodeled disturbances (mass, friction, impact) without explicit mapping."
     },
     {
-      id:'h4', type:'mcq',
-      question:'What does HIM explicitly estimate during robot locomotion?',
-      options:['Ground friction coefficient','Robot velocity','Terrain elevation','Contact force magnitude'],
-      answer:1,
-      explanation:'HIM explicitly estimates velocity, while implicitly simulating the system response as a latent embedding.'
+      type: "image",
+      image: "assets/himloco/overview.jpeg",
+      caption: "HIMLoco Overall Framework",
+      question: "4 (Describe Flowchart): According to the HIMLoco framework, proprioceptive observations branch into both an Encoder and an Actor network. Why doesn't the Actor network simply use the generated latent system embeddings exclusively, rather than concatenating the raw observations?",
+      options: [
+        "Because the latent embedding only encodes implicit environmental disturbances, while the raw observations are necessary to establish the instantaneous kinematic state machine of the joints.",
+        "Because the actor network utilizes a purely convolutional backend that requires raw 1D time-series shapes to compute the Fourier transform.",
+        "Because concatenating raw observations mathematically zeroes out the gradients flowing back into the Contrastive Learning encoder module.",
+        "Because the latent space is completely frozen during deployment, requiring raw sensor data to act as a dynamic override."
+      ],
+      answer: 0,
+      explanation: "The latent mapping extracts hidden dynamics (disturbance, payload, friction). However, basic stabilization requires exact knowledge of 'where are my legs right now', which is immediately provided by the raw proprioceptive joint encoders passed directly into the Actor."
     },
     {
-      id:'h5', type:'mcq',
-      question:'What learning technique does HIMLoco use to train its latent embedding?',
-      options:['Supervised learning','Generative adversarial training','Contrastive learning','Transfer learning'],
-      answer:2,
-      explanation:'Contrastive learning is used to train the embedding — it leverages batch-level information and handles sensor noise robustly.'
+      type: "image",
+      image: "assets/himloco/eq/gae_returns.png",
+      caption: "Generalized Advantage Estimation",
+      question: "5 (Explain Control Loop): Inspect the computation of the TD residual (δ_t) embedded inside the GAE formulation. If a robot begins vibrating unstably, causing the value estimate V(s) to crash toward zero abruptly, how does this immediately impact the advantage sequence?",
+      options: [
+        "The advantage directly maps to infinity, permanently severing the policy update from the physical state space.",
+        "The TD residual becomes massively negative, causing a severe negative pull on the advantage estimate, aggressively penalizing the actions that led up to the vibration.",
+        "The advantage estimate flips its sign to positive, inadvertently rewarding the vibration as an exploratory maneuver.",
+        "The TD residual evaluates to exactly equal to the raw reward step, stripping all multi-step temporal context."
+      ],
+      answer: 1,
+      explanation: "If V(s_t+1) crashes lower than V(s_t), the TD residual δ_t = r_t + γ*V(s_t+1) - V(s_t) becomes negative. This negative error propagates backward through the GAE summation, punishing the preceding policy actions that triggered the instability."
     },
     {
-      id:'h6', type:'mcq',
-      question:'On which real-world robot platform are HIMLoco experiments conducted?',
-      options:['Boston Dynamics Spot','Unitree robots','ANYmal C','MIT Mini Cheetah'],
-      answer:1,
-      explanation:'HIMLoco is validated on Unitree robots in real-world experiments across various terrains.'
+      type: "image",
+      image: "assets/himloco/eq/normalization.png",
+      caption: "Welford's Online Variance Algorithm",
+      question: "6 (Explain Equation): Using the running normalization formulas shown, what systemic initialization issue occurs in the legged policy if the small constant ε (epsilon) is entirely omitted (set to mathematically 0.0)?",
+      options: [
+        "The running mean vector defaults to standard gravity (-9.81), throwing off the orientation estimation matrix.",
+        "During the first few steps when variance across dimensions is naturally zero (all states identical), division by zero occurs causing catastrophic NaN explosions in the network gradients.",
+        "The Welford update step becomes unconditionally additive, causing the running mean to spiral towards infinity.",
+        "The normalization process acts as a low-pass filter, permanently smoothing out all sudden impact spikes from foot touchdowns."
+      ],
+      answer: 1,
+      explanation: "ε is a strict numerical stability term. In early training, identical initialization batches yield zero variance across the sequence. Dividing by zero (√0) outputs NaNs, immediately corrupting the network weights."
     },
     {
-      id:'h7', type:'mcq',
-      question:'What does "IMC" stand for in the context of HIMLoco\'s theoretical foundation?',
-      options:['Internal Motion Controller','Implicit Model Computation','Internal Model Control','Integrated Motor Command'],
-      answer:2,
-      explanation:'IMC = Internal Model Control — a classical control theory paradigm that inspired HIMLoco\'s design.'
+      type: "mcq",
+      question: "7 (Explain the reason using equation concepts): HIMLoco trains primarily on simulated quadruped robots. How does the concept of 'Domain Randomization' mathematically alter the convergence bound of the PPO objective function depicted earlier?",
+      options: [
+        "It minimizes the Kullback-Leibler divergence by forcing all simulated environments to exactly match the target physical hardware.",
+        "It artificially broadens the marginal state distribution P(s), effectively smoothing the optimization landscape and mitigating catastrophic sharp minima that fail in reality.",
+        "It substitutes the need for a stochastic actor policy by adding deterministic Gaussian noise exactly onto the final torque outputs.",
+        "It mathematically guarantees that the Value network will diverge, forcing the algorithm to rely entirely on pure Actor loss."
+      ],
+      answer: 1,
+      explanation: "Domain Randomization adds noise to physics parameters, ensuring the policy doesn't overfit to highly specific mathematical quirks of the simulator (sharp minimas). It broadens the state-space coverage, allowing the surrogate objective to learn generally robust bounds."
     },
     {
-      id:'h8', type:'truefalse',
-      question:'The policy network in HIMLoco receives full environmental observations such as ground friction and elevation maps.',
-      answer:false,
-      explanation:'False! The policy receives only partial observations and the hybrid internal embedding. No raw environmental data is fed directly.'
+      type: "mcq",
+      question: "8 (Explain the function): In the provided HIMActorCritic architecture, actions are drawn from a Normal Distribution whose mean is provided by the Actor MLP, but the standard deviation is an independent, globally learned parameter. Why decouple the std dev from the state input?",
+      options: [
+        "To allow the system to dynamically compute analytical gradients directly through the physical simulator's torque limits.",
+        "To satisfy the theoretical requirement that temporal difference residual bounds must be independent identically distributed (I.I.D.) random variables.",
+        "To enforce a consistent exploration decay across the entire state space, preventing the network from collapsing exploration variance prematurely in highly specific states.",
+        "To vastly increase the parameter count of the Actor multilayer perceptron, accelerating GPU utilization."
+      ],
+      answer: 2,
+      explanation: "If variance is state-dependent, the policy easily gets trapped in local minimums by predicting ~0 variance in states it feels 'confident' in, prematurely halting exploration. A state-independent variance ensures structural, global exploration."
     },
     {
-      id:'h9', type:'mcq',
-      question:'What does the implicit latent embedding in HIMLoco capture?',
-      options:['Exact terrain geometry and friction','System response indicating robot stability','GPS location data','Power consumption of actuators'],
-      answer:1,
-      explanation:'The implicit embedding captures the system\'s response, which naturally encodes stability and environmental disturbance information.'
+      type: "fillblank",
+      question: "9: Rather than fully supervised behavior cloning, the internal model embedding uses ___-supervised learning to compare successive frames and align semantic clusters without manual labeling.",
+      wordBank: ["Semi", "Self", "Weak", "Inverse", "Meta"],
+      answer: "Self",
+      explanation: "Contrastive clustering (like SwAV) generates its own pseudo-labels across views or temporal steps. Because no human annotations are required, it mathematically constitutes Self-Supervised Learning."
     },
     {
-      id:'h10', type:'mcq',
-      question:'In the context of HIMLoco, what is the primary benefit of the Hybrid Internal Model (HIM)?',
-      options:['It completely eliminates the need for any neural network','It allows the policy to operate using ONLY exteroceptive cameras','It mitigates information loss and handles sensory noise efficiently','It requires massive computational power but guarantees perfect stability'],
-      answer:2,
-      explanation:'The HIM addresses limitations of existing learning paradigms by minimizing information loss, handling noisy observations, and improving sample efficiency across different sensor configurations.'
-    },
-    {
-      id:'h11', type:'truefalse',
-      question:'HIMLoco uses contrastive learning to utilize batch-level information and deal with sensor noise.',
-      answer:true,
-      explanation:'True! Contrastive learning in HIMLoco explicitly handles noise and leverages batch-level statistics for a more robust embedding.'
-    },
-    {
-      id:'h12', type:'mcq',
-      question:'In HIMLoco\'s two-component framework, what is the role of the HIM module?',
-      options:['Policy execution and action selection','Information extraction and embedding generation','Reward shaping and curriculum design','Terrain mapping and localization'],
-      answer:1,
-      explanation:'HIM (Hybrid Internal Model) is the information extractor that produces the hybrid internal embedding fed to the policy.'
-    },
-    {
-      id:'h13', type:'fillblank',
-      question:'HIMLoco: "HIM only explicitly estimates ___ and implicitly simulates the system response as an implicit latent embedding."',
-      answer:'velocity',
-      wordBank:['velocity','acceleration','position','torque'],
-      explanation:'HIM explicitly estimates velocity only — not complex environmental features like friction or terrain height.'
-    },
-    {
-      id:'h14', type:'mcq',
-      question:'Which open-source locomotion codebase is HIMLoco built upon?',
-      options:['IsaacGym-Envs','legged_gym','PyBullet-Gym','OpenAI Gym'],
-      answer:1,
-      explanation:'HIMLoco\'s codebase is built upon legged_gym from ETH Zurich\'s Legged Robotics group.'
-    },
-    {
-      id:'h15', type:'truefalse',
-      question:'HIMLoco is validated only in simulation and has NOT been tested on physical robots.',
-      answer:false,
-      explanation:'False! HIMLoco is validated through both simulations across different terrains AND real-world experiments on physical Unitree robots.'
-    },
-    {
-      id:'h16', type:'mcq',
-      question:'In Classical IMC, what does the internal model do to achieve robust control?',
-      options:['It directly maps sensors to motor commands','It simulates system response to estimate disturbances','It predicts future terrain geometry','It computes optimal reward signals'],
-      answer:1,
-      explanation:'The internal model simulates the system\'s expected response; comparing real vs. simulated response reveals the disturbance for compensation.'
-    },
-    {
-      id:'h17', type:'fillblank',
-      question:'HIMLoco applies ___ learning in the Isaac Gym simulation to train the full locomotion policy.',
-      answer:'reinforcement',
-      wordBank:['reinforcement','supervised','unsupervised','federated'],
-      explanation:'HIMLoco uses reinforcement learning (PPO-based: him_ppo.py) to train the locomotion policy in Isaac Gym simulation.'
-    },
-    {
-      id:'h18', type:'mcq',
-      question:'What is the primary advantage of HIMLoco over previous locomotion methods?',
-      options:['Uses more sensors for better terrain mapping','Achieves agility with minimal sensors and fast convergence','Works only on flat, indoor terrain','Requires a pre-built 3D map of the environment'],
-      answer:1,
-      explanation:'HIMLoco achieves substantial agility over challenging terrains with minimal sensors and fast convergence — key contributions of the paper.'
-    },
-    {
-      id:'h19', type:'mcq',
-      question:'Why is contrastive learning used to train the latency embedding in HIMLoco?',
-      options:['To generate high-resolution images of the terrain','To enhance robustness by utilizing batch-level information and dealing with noise','To translate natural language commands into motor actions','To minimize the physical wear and tear on the servos'],
-      answer:1,
-      explanation:'Contrastive learning helps the network explicitly handle noise and leverage batch-level statistics, creating a more robust and adaptable embedding in unpredictable environments.'
-    },
-    {
-      id:'h20', type:'mcq',
-      question:'What is the exact target that the hybrid internal embedding is optimized to mimic?',
-      options:['The exact topographic map of the ground','The robot\'s successor state where system response is naturally embedded','The total power consumption of the robot','A video stream of the robot from an external camera'],
-      answer:1,
-      explanation:'The embedding is optimized to be close to the robot\'s successor state, which naturally embeds the response of the system (and thus, the environmental disturbance).'
-    },
-    // --- Image Questions ---
-    {
-      id:'h21', type:'image',
-      image:'assets/himloco/overview.jpeg',
-      caption:'HIMLoco Framework Overview (from the paper)',
-      question:'Looking at this HIMLoco framework diagram — what are the TWO main components of its architecture?',
-      options:['Encoder Network and Decoder Network','HIM (information extractor) and the Policy Network','Sensor Module and Actuator Module','Simulation Engine and Deployment Module'],
-      answer:1,
-      explanation:'HIMLoco\'s framework has two components: the HIM information extractor (produces hybrid internal embedding) and the Policy Network (produces actions).'
-    },
-    {
-      id:'h22', type:'image',
-      image:'assets/himloco/imc.jpeg',
-      caption:'Control paradigm diagram from HIMLoco paper',
-      question:'This figure illustrates a classical control paradigm that inspired HIMLoco. What is it called?',
-      options:['Model Predictive Control (MPC)','Proportional-Integral-Derivative (PID)','Internal Model Control (IMC)','Reinforcement Learning Control (RLC)'],
-      answer:2,
-      explanation:'This is Internal Model Control (IMC) — the theoretical foundation for HIMLoco\'s approach of using an internal model to simulate robot response.'
-    },
-    {
-      id:'h23', type:'image',
-      image:'assets/himloco/teaser.jpeg',
-      caption:'HIMLoco teaser image from the paper',
-      question:'What does this teaser image from the HIMLoco paper primarily demonstrate?',
-      options:['A robotic arm performing manipulation tasks','A quadruped robot locomoting across challenging terrains','Training loss convergence curves','Simulation environment architectural setup'],
-      answer:1,
-      explanation:'The teaser shows a quadruped robot (Unitree) demonstrating agile locomotion across various challenging real-world terrains.'
-    },
-    {
-      id:'h24', type:'image',
-      image:'assets/himloco/imc.jpeg',
-      caption:'Modified IMC framework for locomotion',
-      question:'In the modified IMC framework shown here, what does the feedback loop help the system estimate?',
-      options:['Future sensor readings from IMU','Environmental disturbances affecting the robot','Battery consumption rate during locomotion','Optimal neural network learning rate'],
-      answer:1,
-      explanation:'The IMC feedback loop uses the internal model to estimate environmental disturbances — friction, restitution, terrain — without explicitly modeling them.'
-    },
-    {
-      id:'h25', type:'image',
-      image:'assets/himloco/overview.jpeg',
-      caption:'HIMLoco policy network inputs',
-      question:'Based on this HIMLoco framework overview, what inputs does the Policy Network receive?',
-      options:['Raw camera images and GPS coordinates','Elevation maps and ground friction values','Partial observations and the hybrid internal embedding','Full state vector from a motion capture system'],
-      answer:2,
-      explanation:'The policy receives partial observations (joint states + IMU) and the hybrid internal embedding from HIM — crucial to its minimal-sensor design.'
-    },
+      type: "truefalse",
+      question: "10: The estimation loss L_est requires the external optical motion capture systems (like Vicon) to capture the ground truth velocity during simulated Isaac Gym training.",
+      answer: false,
+      explanation: "False. Training occurs in a simulator (Isaac Gym) where the privileged true physical velocity is known absolutely by the physics engine. Vicon is entirely unnecessary for generating the ground truth during simulation."
+    }
   ],
-
+  
   navila: [
     {
-      id:'n1', type:'mcq',
-      question:'Why does NaVILA use a hierarchical (two-level) control flow rather than a single end-to-end model?',
-      options:['Because large language models cannot fit on a robot','To decouple slow reasoning (VLA) from fast, high-frequency motor control (Locomotion Policy)','To prevent the robot from understanding human language','Because end-to-end models cannot process RGB camera feeds'],
-      answer:1,
-      explanation:'The VLA runs at a slower inference rate for high-level reasoning, while the low-level locomotion policy must run at a high frequency (e.g., 500Hz) to maintain stability and avoid obstacles.'
+      type: "image",
+      image: "assets/navila/eq/sft_training.png",
+      caption: "NaVILA SFT Training Pipeline",
+      question: "1 (Explain Equation): Observe the SFT Cross-Entropy loss equation L_SFT. What structural limitation arises because this loss exclusively utilizes negative log-likelihood (NLL) against discrete token annotations without incorporating any reinforcement learning penalty loop?",
+      options: [
+        "It fails to capture continuous sequence degradation (Covariate Shift), as it mathematically assumes the agent will always exist exactly on the expert’s grounded trajectory during deployment.",
+        "It requires the LLaMA parameters to be fully unfrozen and trained in FP32 precision to prevent loss explosions.",
+        "It cannot handle language vocabulary tokens natively; all text must be pre-translated into geometric XYZ waypoints.",
+        "It perfectly guarantees optimal path routing by intrinsically discounting future reward pathways."
+      ],
+      answer: 0,
+      explanation: "Supervised Fine-Tuning forces the model to predict the next expert token given a perfect expert history. During deployment, a small error puts the agent off the expert path. SFT loss offers no recovery mathematically (Behavioral Cloning Covariate Shift limitation)."
     },
     {
-      id:'n2', type:'mcq',
-      question:'What does the acronym "VLA" stand for in NaVILA?',
-      options:['Visual Locomotion Algorithm','Vector Language Approach','Vision-Language-Action','Visual-LiDAR-Actuation'],
-      answer:2,
-      explanation:'VLA = Vision-Language-Action — a model class that processes visual and language inputs to output robot actions.'
+      type: "image",
+      image: "assets/navila/method.png",
+      caption: "NaVILA Hierarchy",
+      question: "2 (Describe Flowchart): The NaVILA framework flowchart distinctly separates the 1-2 Hz VLM query execution from the 50 Hz Locomotion control loop. This architectural split is mathematically equivalent to solving which type of classic robotics hierarchy?",
+      options: [
+        "An inverse kinematics mapping problem to a differential drive.",
+        "A multi-arm synchronization trajectory interpolation matrix.",
+        "A receding horizon Model Predictive Control (MPC) layered over a high-frequency Joint-Space PD tracking controller.",
+        "A simultaneous localization and mapping (SLAM) factor graph optimization algorithm."
+      ],
+      answer: 2,
+      explanation: "The LLM generates long-term semantic goals at low frequencies (acting like a Model Predictive trajectory planner generating setpoints), while the Low-Level Locomotion operates rapidly to physically track and stabilize against those setpoints."
     },
     {
-      id:'n3', type:'mcq',
-      question:'What are the two levels of NaVILA\'s hierarchical navigation framework?',
-      options:['Perception layer and Control layer','High-level VLA (language commands) and Low-level locomotion policy','Global path planner and Local path planner','Semantic mapper and Motor feedback controller'],
-      answer:1,
-      explanation:'NaVILA is two-level: a high-level VLA generates language-based navigation commands, and a low-level locomotion policy executes them safely.'
+      type: "image",
+      image: "assets/navila/eq/vln_metrics.png",
+      caption: "VLN Evaluation Metrics",
+      question: "3 (Explain Equation): In the NDTW (Normalized Dynamic Time Warping) equation used for the RxR dataset, if the length tolerance parameter (τ) is excessively small, what is the geometric consequence on the metric outcome?",
+      options: [
+        "The metric becomes unconditionally 1.0, rendering all trajectories structurally indistinguishable.",
+        "The metric harshly suppresses the score exponentially toward zero at the slightest deviation in geometric path velocity or exact shape mapping.",
+        "The calculation undergoes an infinite-loop condition trying to match terminal nodes against starting positions.",
+        "The Euclidean distance computation transforms into Manhattan distance, artificially favoring grid-aligned movements."
+      ],
+      answer: 1,
+      explanation: "The formula exp(-DTW / (τ * |G|)) uses τ in the denominator of the exponent. If τ is microscopic, any non-zero DTW error blows up the negative exponent, collapsing the entire metric score to 0."
     },
     {
-      id:'n4', type:'mcq',
-      question:'Which navigation benchmarks are used to evaluate NaVILA\'s performance?',
-      options:['KITTI and NuScenes','R2R (Room-to-Room) and RxR (Room-across-Room)','ScanNet and Matterport3D','COCO and ImageNet'],
-      answer:1,
-      explanation:'NaVILA is evaluated on R2R and RxR — vision-and-language navigation benchmarks in the Matterport3D environment.'
+      type: "image",
+      image: "assets/navila/eq/sft_training.png",
+      caption: "SFT Diagram",
+      question: "4 (Explain Function/Control Loop): The SigLIP vision encoder processes historical sequences as tokens. Why does processing sequences representing T=8 frames drastically compound the spatial complexity in the Transformer attention mechanism?",
+      options: [
+        "Because attention dynamically zeroes out layers proportional to the temporal gap.",
+        "Because standard self-attention complexity scales strictly quadratically (O(N^2)) with respect to the total number of flattened sequence tokens.",
+        "Because the SigLIP architecture is hard-coded physically to reject any inputs beyond T=1 frame mapping.",
+        "Because multi-frame sequences require parallel gradient differentiation across multiple GPUs to compute the Jacobian."
+      ],
+      answer: 1,
+      explanation: "Each frame produces X visual tokens. 8 frames produce 8*X tokens. Standard self-attention computes an N*N correlation matrix. Thus scaling context length heavily bottlenecks Memory and Compute scaling quadratically."
     },
     {
-      id:'n5', type:'truefalse',
-      question:'NaVILA is a single end-to-end neural network that directly outputs low-level joint torque commands.',
-      answer:false,
-      explanation:'False! NaVILA is a two-level framework. The VLA outputs high-level language commands; a separate locomotion policy handles motor control.'
+      type: "image",
+      image: "assets/navila/eq/vln_metrics.png",
+      caption: "Success Weighted by Path Length (SPL)",
+      question: "5 (Describe Reason using Equation): Observe the SPL formulation. An agent is released into a maze. It takes a massive, random winding path of 100 meters (P_i) to reach a goal sequence that was optimally 5 meters away (L_i), but it successfully arrives. What is its approximate resulting SPL?",
+      options: [
+        "SPL calculates exactly equal to 1.0, because the binary success indicator S_i overrules spatial distance.",
+        "SPL calculates to approximately 0.05, heavily penalizing the catastrophic inefficiency despite the geometric success.",
+        "SPL flips to a negative integer to explicitly penalize looping pathways.",
+        "SPL results in a division by zero error since random walks cannot be correlated to optimal routes."
+      ],
+      answer: 1,
+      explanation: "SPL = S_i * (L_i / max(P_i, L_i)). Since success is met, S_i = 1. L_i = 5. P_i = 100. max(100, 5) = 100. Thus, the SPL is exactly 1 * (5/100) = 0.05, demonstrating extreme inefficiency."
     },
     {
-      id:'n6', type:'mcq',
-      question:'Which large language model backbone does NaVILA build upon?',
-      options:['GPT-4','Gemma-7B','LLaMA 3-8B','Mistral-7B'],
-      answer:2,
-      explanation:'NaVILA uses LLaMA 3-8B as its language backbone (visible in the model name: navila-llama3-8b-8f).'
+      type: "mcq",
+      question: "6 (Explain Function): In the NaVILA training parameters, a technique called LoRA (Low-Rank Adaptation) is highly probable for fine-tuning the 8-Billion parameter LLaMA backbone. Functionally speaking, how does LoRA inject trainable parameters into the network?",
+      options: [
+        "By replacing the massive, rigid pre-trained attention projection layers with fully randomized linear layers.",
+        "By completely flattening the CNN layers into 1D embedding tokens and scaling them against the text inputs.",
+        "By freezing the original pre-trained weight matrices and injecting parallel, tunable low-rank decomposition matrix products (A * B).",
+        "By dynamically stripping out weights that possess gradients strictly below a predefined magnitude threshold."
+      ],
+      answer: 2,
+      explanation: "LoRA posits that weight updates have a low intrinsic dimension. Rather than tuning massive W, it freezes W and trains tiny decomposition matrices A and B, where optimized weights equal W + ΔW, and ΔW = A*B."
     },
     {
-      id:'n7', type:'mcq',
-      question:'What simulator forms the foundation of NaVILA\'s evaluation pipeline?',
-      options:['Isaac Gym and MuJoCo','Habitat Lab and VLN-CE','PyBullet and OpenAI Gym','Gazebo and ROS2'],
-      answer:1,
-      explanation:'NaVILA evaluation is built on Habitat Lab (v0.1.7) and VLN-CE (Vision-and-Language Navigation in Continuous Environments).'
+      type: "mcq",
+      question: "7: The NaVILA model bridges Visual Tokens to Text Token Space across a dimensionality boundary. If SigLIP outputs 768-D embeddings and LLaMA requires 4096-D context, what is the most universally standard network topology to map these?",
+      options: [
+        "A Gaussian Mixture Model clustering node.",
+        "A Multi-Layer Perceptron (MLP) or simple linear projection layer.",
+        "A Recurrent Neural Network unrolled back-propagation loop.",
+        "A Fourier Transform magnitude spectral pool."
+      ],
+      answer: 1,
+      explanation: "Simple MLP projection headers are the universally acclaimed standard (extensively utilized in LLaVA, BLIP, etc.) to project multi-modal geometries into the LLM textual vector-space without distorting the latent shapes."
     },
     {
-      id:'n8', type:'mcq',
-      question:'What advantage does NaVILA gain from its integration with 3D scene question-answering capabilities (e.g., ScanQA)?',
-      options:['It allows the robot to draw 2D floor plans automatically','It provides spatial reasoning and semantic scene understanding without explicit map building','It enables the robot to pass the Turing test','It significantly reduces battery consumption'],
-      answer:1,
-      explanation:'By utilizing 3D scene Q&A datasets, NaVILA relies on Vision-Language-Action semantic reasoning instead of rigidly building traditional 3D geometric maps.'
+      type: "truefalse",
+      question: "8: To successfully generate sequential geometric navigation commands from textual input, LLaMA must explicitly apply 'Causal Attention Masking' during its feed-forward pass, blocking any observation of subsequent future tokens.",
+      answer: true,
+      explanation: "True. Because LLMs generate text auto-regressively mapping from left to right, causal masking guarantees preventing information from 'cheating' by looking forward when generating the Nth sequential command token."
     },
     {
-      id:'n9', type:'truefalse',
-      question:'NaVILA\'s high-level VLA component generates low-level joint torque commands directly.',
-      answer:false,
-      explanation:'False! The VLA generates high-level language-based commands (e.g., "move forward", "turn left"). The locomotion policy converts these to motor commands.'
+      type: "fillblank",
+      question: "9: Navigating massive simulated scenes quickly requires abstracting smooth euclidean collision space into a discrete ___ Graph consisting of nodes and connectable edges.",
+      wordBank: ["Navigation", "Dependency", "Tension", "Residual", "Voronoi"],
+      answer: "Navigation",
+      explanation: "In datasets mapping the real world computationally (Habitat, Matterport3D), physical movement across infinite XY space is condensed mathematically into a Navigation Graph (NavGraph) restricted explicitly to connected waypoints."
     },
     {
-      id:'n10', type:'mcq',
-      question:'What type of dataset provides human demonstration data for NaVILA training?',
-      options:['Motion capture studio recordings','YouTube Human Touring videos','Hospital corridor CCTV footage','VR headset user recordings'],
-      answer:1,
-      explanation:'NaVILA uses YouTube Human Touring videos as demonstration data, annotated for navigation instruction following.'
-    },
-    {
-      id:'n11', type:'mcq',
-      question:'How many frames does the NaVILA model process per inference step?',
-      options:['4 frames','8 frames','16 frames','32 frames'],
-      answer:1,
-      explanation:'NaVILA processes 8 frames per step (training script: sft_8frames.sh, model name: navila-llama3-8b-8f).'
-    },
-    {
-      id:'n12', type:'mcq',
-      question:'What vision encoder does NaVILA use?',
-      options:['CLIP ViT-L/14','DINOv2-ViT-G','SigLIP','ResNet-50'],
-      answer:2,
-      explanation:'NaVILA uses SigLIP as the vision encoder (from pretrain model: navila-siglip-llama3-8b-v1.5-pretrain).'
-    },
-    {
-      id:'n13', type:'truefalse',
-      question:'The NaVILA project releases the raw YouTube videos for its Human Touring training dataset.',
-      answer:false,
-      explanation:'False! Due to copyright, only video IDs and annotations are released. Users download videos themselves using yt-dlp.'
-    },
-    {
-      id:'n14', type:'mcq',
-      question:'What does "VLN-CE" stand for?',
-      options:['Vision-Learning-Navigation Continuous Evaluation','Visual Language Navigation — Controlled Experiment','Vector Learning Navigation — Computational Engine','Vision-and-Language Navigation in Continuous Environments'],
-      answer:3,
-      explanation:'VLN-CE = Vision-and-Language Navigation in Continuous Environments — enabling evaluation in continuous physical spaces.'
-    },
-    {
-      id:'n15', type:'mcq',
-      question:'Which dataset is used for 3D scene question-answering in NaVILA training?',
-      options:['VQAv2','ScanQA','OK-VQA','GQA'],
-      answer:1,
-      explanation:'ScanQA is used for 3D scene understanding question-answering, giving NaVILA spatial reasoning capabilities.'
-    },
-    {
-      id:'n16', type:'fillblank',
-      question:'NaVILA: "It generates high-level ___ commands, while a real-time locomotion policy ensures obstacle avoidance."',
-      answer:'language-based',
-      wordBank:['language-based','joint-torque','GPS-waypoint','pixel-level'],
-      explanation:'NaVILA\'s VLA generates language-based commands (describing navigation intent), which the locomotion policy then executes.'
-    },
-    {
-      id:'n17', type:'mcq',
-      question:'What specific risk does the high-frequency Locomotion Policy mitigate during NaVILA operation?',
-      options:['Language mistranslations from the VLA','Crashing into sudden obstacles while the VLA is processing its next reasoning step','Overheating of the GPU due to LLM inference','Drifting of the GPS coordinates'],
-      answer:1,
-      explanation:'Because VLA inference is slow, the robot would be blind between reasoning steps. The fast Locomotion Policy takes over to ensure real-time obstacle avoidance and stability.'
-    },
-    {
-      id:'n18', type:'truefalse',
-      question:'NaVILA fine-tunes a pretrained model that already has vision-language capabilities rather than training completely from scratch.',
-      answer:true,
-      explanation:'True! NaVILA leverages a pretrained model (combining SigLIP and LLaMA) which is then fine-tuned on embodied navigation datasets.'
-    },
-    {
-      id:'n19', type:'mcq',
-      question:'How does NaVILA utilize the "Human Touring" videos from YouTube?',
-      options:['To teach the robot how to edit video files','As rich demonstration data for visual-language instruction following','To evaluate audio-processing algorithms for ambient noise','To train the robot\'s suspension system'],
-      answer:1,
-      explanation:'Human Touring videos provide diverse, real-world visual trajectories. NaVILA uses them, alongside annotations, as strong demonstration data for instruction following.'
-    },
-    {
-      id:'n20', type:'mcq',
-      question:'What key capability does NaVILA\'s low-level locomotion policy specifically ensure during navigation?',
-      options:['Long-distance path planning','Real-time obstacle avoidance','GPS-based self-localization','Building a semantic 3D map'],
-      answer:1,
-      explanation:'The low-level locomotion policy ensures real-time obstacle avoidance, running at high frequency independent of the slow VLA inference.'
-    },
-    // --- Image Questions ---
-    {
-      id:'n21', type:'image',
-      image:'assets/navila/method.png',
-      caption:'NaVILA two-level framework architecture (from paper)',
-      question:'This NaVILA architecture diagram shows a two-level hierarchy. What does the HIGH-LEVEL component output?',
-      options:['Low-level joint torque commands directly to motors','Language-based navigation commands','Raw sensor data processed results','GPS waypoints for path planning'],
-      answer:1,
-      explanation:'The high-level VLA outputs language-based commands (e.g., "go forward", "turn left") that are passed to the locomotion controller.'
-    },
-    {
-      id:'n22', type:'image',
-      image:'assets/navila/logo.png',
-      caption:'Project logo',
-      question:'This is the logo for which AI robotics research project about legged robot navigation?',
-      options:['HIMLoco — Hybrid Internal Model','VILA — Visual Language Assistant','NaVILA — Navigation VLA Model','ANYmal — Autonomous Robot'],
-      answer:2,
-      explanation:'This is the NaVILA logo — the Legged Robot Vision-Language-Action Model for Navigation (RSS 2025).'
-    },
-    {
-      id:'n23', type:'image',
-      image:'assets/navila/method.png',
-      caption:'NaVILA two-level system diagram',
-      question:'In this NaVILA system diagram, what specific function does the LOW-LEVEL policy handle?',
-      options:['Generating language navigation instructions','Understanding semantic scene content from video','Real-time locomotion control and obstacle avoidance','Calling the large language model for decision making'],
-      answer:2,
-      explanation:'The low-level locomotion policy handles real-time motion control and obstacle avoidance — running faster than VLA inference for safe navigation.'
-    },
-    {
-      id:'n24', type:'image',
-      image:'assets/navila/method.png',
-      caption:'NaVILA hierarchical control flow',
-      question:'Based on this NaVILA framework diagram, which statement BEST describes the interaction between the two levels?',
-      options:['Both the VLA and locomotion policy run at the same 500Hz control frequency','The high-level VLA sends commands to the low-level locomotion controller','The locomotion policy trains the VLA through online reinforcement learning','Both levels share identical neural network weights through parameter sharing'],
-      answer:1,
-      explanation:'The VLA runs at a lower (slower) frequency, sending language commands to the locomotion controller which runs at high frequency for real-time control.'
-    },
-    {
-      id:'n25', type:'image',
-      image:'assets/navila/logo.png',
-      caption:'NaVILA robot type',
-      question:'Based on the NaVILA logo, what class of robotic system does NaVILA primarily target for navigation?',
-      options:['Wheeled mobile robots (differential drive)','Legged quadruped robots','Fixed-wing aerial drones','Industrial robotic arms'],
-      answer:1,
-      explanation:'NaVILA targets legged (quadruped) robots — which have unique navigation challenges due to their dynamic, complex locomotion systems.'
-    },
+      type: "mcq",
+      question: "10 (Explain the Reason): When training the low-level locomotion policies acting beneath the VLA hierarchy, continuous torques are preferred over discretized action bounding (like choosing from 4 rigid steps). Why?",
+      options: [
+        "Because discrete bounding mathematically guarantees unstable cyclical limits in Inverse Kinematics solving.",
+        "Because physical dynamics inherently occupy a fluid, continuous torque envelope; discretizing drastically limits smooth gait synthesis and stability recovery.",
+        "Because it is practically impossible to write discrete vectors into PyTorch GPU buffers directly.",
+        "Because simulation parameters like Restitution solely respond to 64-bit integer indexing fields."
+      ],
+      answer: 1,
+      explanation: "Discretization 'bins' choices, stripping out nuance. Continuous policies generate smooth gaussian probability distributions over infinite granular states. When physically reacting to sudden impacts or uneven mesh surfaces, granular smoothness distinguishes success from failing drastically."
+    }
   ]
 };
